@@ -13,7 +13,7 @@ def main():
     max_ouput_len = 128
 
     path = os.path.expanduser("/content/Qwen3-0.6B")
-    llm = LLM(path, enforce_eager=True, max_model_len=4096)
+    llm = LLM(path, enforce_eager=False, max_model_len=4096)
 
     prompt_token_ids = [
         [randint(0, 10000) for _ in range(randint(100, max_input_len))]
