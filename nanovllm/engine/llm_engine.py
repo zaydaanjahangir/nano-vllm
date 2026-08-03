@@ -49,9 +49,14 @@ class LLMEngine:
     def step(self):
         seqs, is_prefill = self.scheduler.schedule()
         num_tokens = sum(seq.num_scheduled_tokens for seq in seqs) if is_prefill else -len(seqs)
+        kind = "PREFILL" if is_prefill else "DECODE "
+        print(f"[step] {kind} batch={len(seqs)} ids={[s.seq_id for s in seqs]} "
+              f"running={len(self.scheduler.running)} waiting={len(self.scheduler.waiting)}")
         token_ids = self.model_runner.call("run", seqs, is_prefill)
         self.scheduler.postprocess(seqs, token_ids, is_prefill)
         outputs = [(seq.seq_id, seq.completion_token_ids) for seq in seqs if seq.is_finished]
+        for seq_id, _ in outputs:
+            print(f"[step]   -> seq {seq_id} FINISHED")
         return outputs, num_tokens
 
     def is_finished(self):
